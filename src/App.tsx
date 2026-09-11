@@ -85,8 +85,8 @@ export function App() {
       <header className="w-full max-w-[960px] flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <img
-            src="./mascot/mascot_smile.png"
-            alt="Mascota Ninja"
+            src="./mascot/blue_smile.png"
+            alt="Mascota Ninja Azul"
             className="w-11 h-11 object-contain rounded-2xl bg-slate-900 border border-slate-700 shadow-lg p-0.5"
           />
           <div>

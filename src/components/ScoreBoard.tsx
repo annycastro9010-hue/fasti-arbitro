@@ -46,7 +46,7 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
       <div className="flex items-center gap-6">
         {/* Tu Equipo */}
         <div className="flex items-center gap-3 bg-blue-950/60 border border-blue-500/40 rounded-xl px-4 py-2">
-          <img src="./mascot/mascot_smile.png" alt="Ninja Azul" className="w-8 h-8 object-contain rounded-lg shadow-sm" />
+          <img src="./mascot/blue_smile.png" alt="Ninja Azul" className="w-8 h-8 object-contain rounded-lg shadow-sm" />
           <div>
             <div className="text-xs font-semibold text-blue-300 uppercase tracking-wider">Ninjas Azules</div>
             <div className="text-3xl font-black text-white">{scorePlayer}</div>
@@ -61,7 +61,7 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
             <div className="text-xs font-semibold text-red-300 uppercase tracking-wider text-right">Ninjas Rojos</div>
             <div className="text-3xl font-black text-white text-right">{scoreRival}</div>
           </div>
-          <img src="./mascot/mascot_serious.png" alt="Ninja Rojo" className="w-8 h-8 object-contain rounded-lg shadow-sm filter hue-rotate-140" />
+          <img src="./mascot/red_smile.png" alt="Ninja Rojo" className="w-8 h-8 object-contain rounded-lg shadow-sm" />
         </div>
       </div>
 

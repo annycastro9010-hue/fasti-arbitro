@@ -50,18 +50,21 @@ export function drawPixelHero({
   ctx.scale(dir * 1.3, 1.3);
   ctx.rotate(runTilt);
 
-  // Palette definitions
-  const bodyColor = isPlayerTeam ? '#1d5a68' : '#881337';
-  const bodyHighlight = isPlayerTeam ? '#2e7a8c' : '#b91c1c';
-  const bodyShadow = isPlayerTeam ? '#133e48' : '#4c0519';
+  // Palette definitions: Same iconic teal cube body for BOTH teams
+  const bodyColor = '#1d5a68';
+  const bodyHighlight = '#2e7a8c';
+  const bodyShadow = '#133e48';
   const outlineColor = '#09161a';
 
-  const bandRed = '#e11d48';
-  const bandHighlight = '#fb7185';
-  const bandShadow = '#9f1239';
-  const ponytailColor = '#881337';
-  const ponytailShadow = '#4c0519';
-  const ponytailHighlight = '#9f1239';
+  // Headband, Ponytail and Wristband: BLUE for player team, RED for rival team
+  const bandColor = isPlayerTeam ? '#2563eb' : '#e11d48';
+  const bandHighlight = isPlayerTeam ? '#38bdf8' : '#fb7185';
+  const bandShadow = isPlayerTeam ? '#1d4ed8' : '#9f1239';
+
+  const ponytailColor = isPlayerTeam ? '#2563eb' : '#881337';
+  const ponytailShadow = isPlayerTeam ? '#1e3a8a' : '#4c0519';
+  const ponytailHighlight = isPlayerTeam ? '#38bdf8' : '#9f1239';
+  const wristbandColor = isPlayerTeam ? '#2563eb' : '#e11d48';
 
   // 1. DRAW HEADBAND PONYTAIL / RIBBON (Drawn behind the body on the left/back side)
   drawPonytail(ctx, {
@@ -103,9 +106,9 @@ export function drawPixelHero({
     outlineColor,
   });
 
-  // 5. DRAW RED NINJA HEADBAND
+  // 5. DRAW NINJA HEADBAND (BLUE for Player Team, RED for Rival Team)
   drawHeadband(ctx, {
-    bandRed,
+    bandColor,
     bandHighlight,
     bandShadow,
     outlineColor,
@@ -132,7 +135,7 @@ export function drawPixelHero({
     bodyColor,
     bodyHighlight,
     outlineColor,
-    bandRed,
+    wristbandColor,
     currentTime,
   });
 
@@ -387,17 +390,17 @@ function drawBody(
 }
 
 /**
- * Draw the thick red ninja headband across the forehead.
+ * Draw the ninja headband across the forehead (Blue or Red).
  */
 function drawHeadband(
   ctx: CanvasRenderingContext2D,
   {
-    bandRed,
+    bandColor,
     bandHighlight,
     bandShadow,
     outlineColor,
   }: {
-    bandRed: string;
+    bandColor: string;
     bandHighlight: string;
     bandShadow: string;
     outlineColor: string;
@@ -412,8 +415,8 @@ function drawHeadband(
   ctx.fillStyle = outlineColor;
   ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
 
-  // Main red band
-  ctx.fillStyle = bandRed;
+  // Main band
+  ctx.fillStyle = bandColor;
   ctx.fillRect(x, y, w, h);
 
   // Top highlight line
@@ -587,7 +590,7 @@ function drawPixelArm(
     bodyColor,
     bodyHighlight,
     outlineColor,
-    bandRed,
+    wristbandColor,
     currentTime,
   }: {
     player: Player;
@@ -596,7 +599,7 @@ function drawPixelArm(
     bodyColor: string;
     bodyHighlight: string;
     outlineColor: string;
-    bandRed: string;
+    wristbandColor: string;
     currentTime: number;
   }
 ) {
@@ -666,10 +669,10 @@ function drawPixelArm(
     // Segment 2: Forearm block
     drawArmBlock(ctx, 5, -3, 6, 6, bodyHighlight, outlineColor);
 
-    // Segment 3: Red ninja wristband
+    // Segment 3: Team wristband (Blue or Red)
     ctx.fillStyle = outlineColor;
     ctx.fillRect(10, -4, 4, 8);
-    ctx.fillStyle = bandRed;
+    ctx.fillStyle = wristbandColor;
     ctx.fillRect(11, -3, 2, 6);
 
     // Segment 4: Pixel Mitten / Hand (clutching fingers)

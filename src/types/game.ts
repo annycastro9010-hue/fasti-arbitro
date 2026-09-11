@@ -5,6 +5,9 @@ export interface Position {
   y: number;
 }
 
+export type HeroExpression = 'smile' | 'tongue' | 'serious' | 'dazed';
+export type ArmState = 'none' | 'holding' | 'charging' | 'throwing';
+
 export interface Player {
   id: string;
   name: string;
@@ -20,6 +23,14 @@ export interface Player {
   hasBall: boolean;
   stunTimer: number; // For when tackled or hit
   facingAngle: number;
+  runCycle: number;
+  armState: ArmState;
+  armTimer: number;
+  armChargePower?: number;
+  throwAngle?: number;
+  expression: HeroExpression;
+  expressionTimer: number;
+  facingDirection: 1 | -1;
 }
 
 export interface Ball {

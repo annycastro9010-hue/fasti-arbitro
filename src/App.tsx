@@ -84,9 +84,11 @@ export function App() {
       {/* Encabezado Principal */}
       <header className="w-full max-w-[960px] flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-2xl shadow-lg shadow-blue-500/30">
-            ⚽
-          </div>
+          <img
+            src="./mascot/mascot_smile.png"
+            alt="Mascota Ninja"
+            className="w-11 h-11 object-contain rounded-2xl bg-slate-900 border border-slate-700 shadow-lg p-0.5"
+          />
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-tight text-white flex items-center gap-2 m-0">
               PELOTAZO CAOS 3v3

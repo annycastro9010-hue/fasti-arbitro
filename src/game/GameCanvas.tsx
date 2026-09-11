@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import type { Player, Ball, Referee, FloatingText, ComicDustParticle, GameState } from '../types/game';
 import { sounds } from '../audio/soundEffects';
 import confetti from 'canvas-confetti';
+import { drawPixelHero } from './pixelHeroRenderer';
 
 export interface ChatInsultEvent {
   playerText: string;
@@ -77,14 +78,14 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
   const playersRef = useRef<Player[]>([
     // Player Team (Azul)
-    { id: 'p1', name: 'Tú (Lanzador)', team: 'player', number: 10, x: 230, y: 270, vx: 0, vy: 0, speed: 4.4, radius: 18, isControlled: true, hasBall: true, stunTimer: 0, facingAngle: 0 },
-    { id: 'p2', name: 'Nico (Ala)', team: 'player', number: 7, x: 170, y: 150, vx: 0, vy: 0, speed: 4.0, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0 },
-    { id: 'p3', name: 'Leo (Defensa)', team: 'player', number: 4, x: 130, y: 390, vx: 0, vy: 0, speed: 3.9, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0 },
+    { id: 'p1', name: 'Tú (Lanzador)', team: 'player', number: 10, x: 230, y: 270, vx: 0, vy: 0, speed: 4.4, radius: 18, isControlled: true, hasBall: true, stunTimer: 0, facingAngle: 0, runCycle: 0, armState: 'holding', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: 1 },
+    { id: 'p2', name: 'Nico (Ala)', team: 'player', number: 7, x: 170, y: 150, vx: 0, vy: 0, speed: 4.0, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: 1 },
+    { id: 'p3', name: 'Leo (Defensa)', team: 'player', number: 4, x: 130, y: 390, vx: 0, vy: 0, speed: 3.9, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: 1 },
 
     // Rival Team (Rojo)
-    { id: 'r1', name: 'Rival Ariete', team: 'rival', number: 9, x: 730, y: 270, vx: 0, vy: 0, speed: 3.8, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI },
-    { id: 'r2', name: 'Rival Tirador', team: 'rival', number: 8, x: 790, y: 160, vx: 0, vy: 0, speed: 3.7, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI },
-    { id: 'r3', name: 'Rival Bloqueador', team: 'rival', number: 3, x: 840, y: 380, vx: 0, vy: 0, speed: 3.6, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI },
+    { id: 'r1', name: 'Rival Ariete', team: 'rival', number: 9, x: 730, y: 270, vx: 0, vy: 0, speed: 3.8, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: -1 },
+    { id: 'r2', name: 'Rival Tirador', team: 'rival', number: 8, x: 790, y: 160, vx: 0, vy: 0, speed: 3.7, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: -1 },
+    { id: 'r3', name: 'Rival Bloqueador', team: 'rival', number: 3, x: 840, y: 380, vx: 0, vy: 0, speed: 3.6, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: -1 },
   ]);
 
   const rivalShootTimerRef = useRef(0);
@@ -208,13 +209,13 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     const nextOwner = scoringTeam === 'player' ? 'r1' : 'p1';
 
     playersRef.current = [
-      { id: 'p1', name: 'Tú (Lanzador)', team: 'player', number: 10, x: 230, y: 270, vx: 0, vy: 0, speed: 4.4, radius: 18, isControlled: true, hasBall: nextOwner === 'p1', stunTimer: 0, facingAngle: 0 },
-      { id: 'p2', name: 'Nico (Ala)', team: 'player', number: 7, x: 170, y: 150, vx: 0, vy: 0, speed: 4.0, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0 },
-      { id: 'p3', name: 'Leo (Defensa)', team: 'player', number: 4, x: 130, y: 390, vx: 0, vy: 0, speed: 3.9, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0 },
+      { id: 'p1', name: 'Tú (Lanzador)', team: 'player', number: 10, x: 230, y: 270, vx: 0, vy: 0, speed: 4.4, radius: 18, isControlled: true, hasBall: nextOwner === 'p1', stunTimer: 0, facingAngle: 0, runCycle: 0, armState: nextOwner === 'p1' ? 'holding' : 'none', armTimer: 0, expression: scoringTeam === 'player' ? 'tongue' : 'serious', expressionTimer: 120, facingDirection: 1 },
+      { id: 'p2', name: 'Nico (Ala)', team: 'player', number: 7, x: 170, y: 150, vx: 0, vy: 0, speed: 4.0, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: 1 },
+      { id: 'p3', name: 'Leo (Defensa)', team: 'player', number: 4, x: 130, y: 390, vx: 0, vy: 0, speed: 3.9, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: 0, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: 1 },
 
-      { id: 'r1', name: 'Rival Ariete', team: 'rival', number: 9, x: 730, y: 270, vx: 0, vy: 0, speed: 3.8, radius: 18, isControlled: false, hasBall: nextOwner === 'r1', stunTimer: 0, facingAngle: Math.PI },
-      { id: 'r2', name: 'Rival Tirador', team: 'rival', number: 8, x: 790, y: 160, vx: 0, vy: 0, speed: 3.7, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI },
-      { id: 'r3', name: 'Rival Bloqueador', team: 'rival', number: 3, x: 840, y: 380, vx: 0, vy: 0, speed: 3.6, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI },
+      { id: 'r1', name: 'Rival Ariete', team: 'rival', number: 9, x: 730, y: 270, vx: 0, vy: 0, speed: 3.8, radius: 18, isControlled: false, hasBall: nextOwner === 'r1', stunTimer: 0, facingAngle: Math.PI, runCycle: 0, armState: nextOwner === 'r1' ? 'holding' : 'none', armTimer: 0, expression: scoringTeam === 'rival' ? 'tongue' : 'serious', expressionTimer: 120, facingDirection: -1 },
+      { id: 'r2', name: 'Rival Tirador', team: 'rival', number: 8, x: 790, y: 160, vx: 0, vy: 0, speed: 3.7, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: -1 },
+      { id: 'r3', name: 'Rival Bloqueador', team: 'rival', number: 3, x: 840, y: 380, vx: 0, vy: 0, speed: 3.6, radius: 18, isControlled: false, hasBall: false, stunTimer: 0, facingAngle: Math.PI, runCycle: 0, armState: 'none', armTimer: 0, expression: 'smile', expressionTimer: 0, facingDirection: -1 },
     ];
 
     const ownerPlayer = playersRef.current.find(p => p.id === nextOwner)!;
@@ -251,6 +252,10 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     if (!controlledPlayer || !controlledPlayer.hasBall) return;
 
     controlledPlayer.hasBall = false;
+    controlledPlayer.armState = 'throwing';
+    controlledPlayer.armTimer = 0;
+    controlledPlayer.throwAngle = controlledPlayer.facingAngle;
+
     ballRef.current.ownerId = null;
     ballRef.current.elevation = 20 + power * 8;
     lastThrowerRef.current = controlledPlayer.id;
@@ -268,12 +273,16 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
     if (isSuperShot) {
       gameStateRef.current.screenShake = 10;
+      controlledPlayer.expression = 'tongue';
+      controlledPlayer.expressionTimer = 80;
       sounds.playPunch();
       sounds.playKick();
       addFloatingText('🔥 ¡SUPERTIRO FURIOSO! 🚀', controlledPlayer.x, controlledPlayer.y - 35, '#f97316');
       addDustExplosion(controlledPlayer.x, controlledPlayer.y, 14, '#fdba74');
     } else {
       sounds.playKick();
+      controlledPlayer.expression = 'smile';
+      controlledPlayer.expressionTimer = 50;
       const pct = Math.round(power * 100);
       addFloatingText(`¡TIRO ${pct}%! 🖐️`, controlledPlayer.x, controlledPlayer.y - 30, '#38bdf8');
       addDustExplosion(controlledPlayer.x, controlledPlayer.y, 6, '#cbd5e1');
@@ -284,6 +293,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     const controlledPlayer = playersRef.current.find(p => p.isControlled);
     if (controlledPlayer?.hasBall) {
       chargeRef.current.isCharging = true;
+      controlledPlayer.armState = 'charging';
+      controlledPlayer.expression = 'serious';
     } else {
       const ball = ballRef.current;
       if (!controlledPlayer) return;
@@ -294,6 +305,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         }
         ball.ownerId = controlledPlayer.id;
         controlledPlayer.hasBall = true;
+        controlledPlayer.armState = 'holding';
+        controlledPlayer.armTimer = 0;
         ball.elevation = 12;
         lastThrowerRef.current = null;
         throwCooldownRef.current = 0;
@@ -564,6 +577,12 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
                 rivalShootTimerRef.current += 1;
 
+                if (rivalShootTimerRef.current > 10) {
+                  player.armState = 'charging';
+                  player.armChargePower = Math.min(1, rivalShootTimerRef.current / 48);
+                  player.expression = 'serious';
+                }
+
                 // Fire trail windup particles
                 if (rivalShootTimerRef.current % 12 === 0 && rivalShootTimerRef.current < 45) {
                   addFireTrail(player.x - 14, player.y);
@@ -573,6 +592,10 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
                 if (rivalShootTimerRef.current >= 48) {
                   rivalShootTimerRef.current = 0;
                   player.hasBall = false;
+                  player.armState = 'throwing';
+                  player.armTimer = 0;
+                  player.expression = 'tongue';
+                  player.expressionTimer = 60;
                   ball.ownerId = null;
 
                   const rivalPower = 0.68 + Math.random() * 0.32; // 0.68 - 1.0
@@ -695,6 +718,73 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
           player.x = Math.max(player.radius + 20, Math.min(FIELD_WIDTH - player.radius - 20, player.x));
           player.y = Math.max(player.radius + 25, Math.min(FIELD_HEIGHT - player.radius - 25, player.y));
+
+          // --- PIXEL ANIMATION UPDATES ---
+          const spd = Math.hypot(player.vx, player.vy);
+          const isMoving = spd > 0.35;
+
+          // 1. Run cycle and running dust particles
+          if (isMoving && player.stunTimer <= 0) {
+            player.runCycle = (player.runCycle + spd * 0.048) % 1;
+            if (Math.random() < 0.22) {
+              const facing = player.facingDirection || 1;
+              particlesRef.current.push({
+                id: Math.random().toString(),
+                x: player.x - facing * 10 + (Math.random() - 0.5) * 6,
+                y: player.y + 14,
+                vx: -facing * (0.8 + Math.random() * 0.7),
+                vy: -0.3 - Math.random() * 0.4,
+                size: 2 + Math.random() * 2,
+                color: player.team === 'player' ? '#93c5fd' : '#fca5a5',
+                life: 0,
+                maxLife: 15,
+              });
+            }
+          } else {
+            player.runCycle = 0;
+          }
+
+          // 2. Facing direction based on movement
+          if (Math.abs(player.vx) > 0.35) {
+            player.facingDirection = player.vx > 0 ? 1 : -1;
+          }
+
+          // 3. Arm state and timers
+          if (player.armState === 'throwing') {
+            player.armTimer += 1;
+            if (player.armTimer > 18) {
+              player.armState = player.hasBall ? 'holding' : 'none';
+              player.armTimer = 0;
+            }
+          } else if (player.hasBall) {
+            if (player.isControlled && chargeRef.current.isCharging) {
+              player.armState = 'charging';
+              player.armChargePower = chargeRef.current.power;
+            } else if (!player.isControlled && player.team === 'rival' && rivalShootTimerRef.current > 10) {
+              player.armState = 'charging';
+              player.armChargePower = Math.min(1, rivalShootTimerRef.current / 48);
+            } else {
+              player.armState = 'holding';
+            }
+          } else {
+            player.armState = 'none';
+          }
+
+          // 4. Facial expressions
+          if (player.expressionTimer > 0) {
+            player.expressionTimer -= 1;
+            if (player.expressionTimer <= 0) {
+              player.expression = 'smile';
+            }
+          } else if (player.stunTimer > 0) {
+            player.expression = 'dazed';
+          } else if (player.armState === 'charging') {
+            player.expression = 'serious';
+          } else if (spd > 3.0) {
+            player.expression = 'tongue';
+          } else {
+            player.expression = 'smile';
+          }
         });
 
         // --- REFEREE (STATIONARY AT TOP CENTER: 480, 58) ---
@@ -727,10 +817,22 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         if (ball.ownerId) {
           const owner = playersRef.current.find(p => p.id === ball.ownerId);
           if (owner) {
-            const handAngle = owner.facingAngle - 0.4;
-            ball.x = owner.x + Math.cos(handAngle) * 18;
-            ball.y = owner.y + Math.sin(handAngle) * 18;
-            ball.elevation = 14;
+            const dir = owner.facingDirection || 1;
+            const shoulderX = owner.x + dir * 17;
+            const shoulderY = owner.y + 4;
+
+            if (owner.armState === 'charging') {
+              const pwr = owner.isControlled ? chargeRef.current.power : (owner.armChargePower || 0.5);
+              const armAngle = -Math.PI * 0.45 - pwr * 0.35;
+              const armLen = (16 + pwr * 4) * 1.3;
+              ball.x = shoulderX + dir * Math.cos(armAngle) * armLen;
+              ball.y = shoulderY + Math.sin(armAngle) * armLen;
+              ball.elevation = 14 + pwr * 6;
+            } else {
+              ball.x = shoulderX + dir * 19;
+              ball.y = shoulderY + 4;
+              ball.elevation = 12;
+            }
             ball.vx = 0;
             ball.vy = 0;
           } else {
@@ -1011,60 +1113,51 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
       // Render Players
       playersRef.current.forEach(p => {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        // Pixel-art oval shadow under character
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
         ctx.beginPath();
-        ctx.ellipse(p.x, p.y + p.radius + 2, p.radius * 0.9, 6, 0, 0, Math.PI * 2);
+        ctx.ellipse(p.x, p.y + 17, 16, 5, 0, 0, Math.PI * 2);
         ctx.fill();
 
+        // Controlled player indicator (halo + pulsing arrow)
         if (p.isControlled) {
           ctx.strokeStyle = '#facc15';
-          ctx.lineWidth = 3;
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius + 7, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y + 2, 26, 0, Math.PI * 2);
           ctx.stroke();
 
+          const arrowBob = Math.sin(currentTime * 0.008) * 3;
           ctx.fillStyle = '#facc15';
           ctx.beginPath();
-          ctx.moveTo(p.x, p.y - p.radius - 12);
-          ctx.lineTo(p.x - 6, p.y - p.radius - 20);
-          ctx.lineTo(p.x + 6, p.y - p.radius - 20);
+          ctx.moveTo(p.x, p.y - 25 + arrowBob);
+          ctx.lineTo(p.x - 5, p.y - 33 + arrowBob);
+          ctx.lineTo(p.x + 5, p.y - 33 + arrowBob);
           ctx.closePath();
           ctx.fill();
         }
 
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.beginPath();
-        ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.team === 'player' ? '#2563eb' : '#dc2626';
-        ctx.fill();
-        ctx.lineWidth = 2.5;
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
+        // Draw the full pixel-art ninja hero (with running cycle, flowing ribbon, expressions & pixel arm)
+        drawPixelHero({
+          ctx,
+          player: p,
+          currentTime,
+          isCharging: p.isControlled && chargeRef.current.isCharging,
+          chargePower: p.isControlled ? chargeRef.current.power : (p.armChargePower || 0),
+        });
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 13px system-ui';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(p.number.toString(), 0, 1);
-
-        const handDist = p.radius + 3;
-        ctx.fillStyle = '#fed7aa';
-        ctx.beginPath();
-        ctx.arc(Math.cos(p.facingAngle - 0.5) * handDist, Math.sin(p.facingAngle - 0.5) * handDist, 4.5, 0, Math.PI * 2);
-        ctx.arc(Math.cos(p.facingAngle + 0.5) * handDist, Math.sin(p.facingAngle + 0.5) * handDist, 4.5, 0, Math.PI * 2);
-        ctx.fill();
-
+        // Stunned / Dazed effect
         if (p.stunTimer > 0) {
-          ctx.font = '14px serif';
-          ctx.fillText('💫', 0, -p.radius - 6);
+          ctx.font = '16px serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('💫', p.x, p.y - 26);
         }
-        ctx.restore();
 
-        ctx.font = '11px system-ui';
+        // Name & Number pixel tag
+        ctx.font = 'bold 11px system-ui';
         ctx.fillStyle = p.team === 'player' ? '#93c5fd' : '#fca5a5';
         ctx.textAlign = 'center';
-        ctx.fillText(p.name, p.x, p.y + p.radius + 16);
+        ctx.fillText(`${p.name} #${p.number}`, p.x, p.y + 28);
       });
 
       // Render Ball
